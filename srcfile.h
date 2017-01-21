@@ -12,12 +12,24 @@ typedef struct __FILE{
 
 ABC INFILE; 
 
+int __global_argc;
+char **__global_argv = NULL;
+
+void makeglobal(int argc, char *argv[]){
+    __global_argc = argc;
+    __global_argv = argv;
+
+    INFILE.argcnt = argc;
+}
+
 bool getSourceFile(){
 	if (INFILE.argcnt < 2){
     	cerr << "No input file!" << endl;
     	cerr << "Usage : sasm <filename>" << endl;
     	return false;
     }
+
+    INFILE.name = __global_argv[1];
 
     ifstream file(INFILE.name);
 

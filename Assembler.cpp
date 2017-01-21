@@ -11,8 +11,7 @@ bool emptyLine(string);
 void runAssembler(void);
 
 void initialize(int argc, char *argv[]){
-	INFILE.argcnt = argc;
-	INFILE.name = argv[1];
+	makeglobal(argc, argv);
 }
 
 bool comment(string line){
@@ -33,6 +32,7 @@ bool comment(string line){
 	}
 
 	return false;
+}
 
 bool emptyLine(string line){
 	if(line[0] == '\n')
