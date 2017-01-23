@@ -1,0 +1,13 @@
+Comment : //This is a comment
+Comment : //More comments
+Comment : //Comment after a line
+ABC|START|100
+Numeric : 100
+Comment : 	//Program starts
+-|A|1,D
+No label defined! 
+1|D
+D|DC|F'100'
+Second type
+1|0|D|F|100
+Program ended
