@@ -12,11 +12,11 @@ Two Pass Assembler in C++
   
 ### Installation
   Compile the Assembler.cpp file as follows
-  `$ c++ Assembler.cpp -o asm`
+  `$ c++ Assembler.cpp -o sasm`
   
   Now its ready to use
-  `$ asm sample.asm`
+  `$ sasm sample.asm`
 
 ### Demo
   For demo use the __*sample.asm*__ file as a input
-  `$ asm sample.asm`
+  `$ sasm sample.asm`
