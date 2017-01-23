@@ -88,8 +88,14 @@ int getOperationType(string str){
 			return 2;
 	}
 
-	if(isdigit(str[0]))
+	if(isdigit(str[0])){
+		if(str.length() > 1 && isdigit(str[1])){
 			return 3;
+		}
+		else{
+			return 2;
+		}
+	}
 	return 99;
 }
 
@@ -119,10 +125,17 @@ store getStorage(string sym, string type, string str){
 
 	__store.sym = sym;
 	__store.type = str[0];
-	int i = 1;
-	while(str[i+1] != '\'')
-		i++;
-	__store.value = str.substr(2, i-1);
+	int i;
+	if(__store.isConstant){
+		i = 1;
+		while(str[i+1] != '\'')
+			i++;
+		__store.value = str.substr(2, i-1);
+	}
+	else if(__store.isStorage){
+		__store.value = str;
+	}
+	
 
 	return __store;
 }
@@ -131,9 +144,10 @@ assign getOperation(string str){
 	assign __op;
 
 	__op.reg = str[0];
-	for(int i = 1; i < str.length(); i++){
+	int len = str.length();
+	for(int i = 1; i < len; i++){
 		if(str[i] == ','){
-			__op.sym = str[i+1];
+			__op.sym = str.substr(i+1, len - i - 1);
 			break;
 		}
 	}

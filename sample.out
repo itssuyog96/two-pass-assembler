@@ -1,13 +1,28 @@
 Comment : //This is a comment
 Comment : //More comments
 Comment : //Comment after a line
-ABC|START|100
-Numeric : 100
-Comment : 	//Program starts
--|A|1,D
-No label defined! 
-1|D
-D|DC|F'100'
+XYZ|START|0
 Second type
-1|0|D|F|100
+0|0|XYZ|0|
+-|USING|*,15
+No label defined! 
+*|15
+-|L|1,FIVE
+No label defined! 
+1|FIVE
+-|A|1,FOUR
+No label defined! 
+1|FOUR
+-|ST|TEMP
+No label defined! 
+Invalid operation!
+FIVE|DC|F'4'
+Second type
+1|0|FIVE|F|4
+FOUR|DC|F'5'
+Second type
+1|0|FOUR|F|5
+TEMP|DS|1F
+Second type
+0|1|TEMP|1|1F
 Program ended
