@@ -2,10 +2,9 @@
 //More comments
 
 //Comment after a line
-
-START 100
+ABC START 100
 	//Program starts
-	A 1, D
-D	DC	F'10'
+-	A 1,D
+D	DC	F'100'
 END
 //Program ends
