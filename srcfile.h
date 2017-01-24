@@ -49,7 +49,7 @@ bool getSourceFile(){
     return true;
 }
 
-int fileSize(){
+inline int fileSize(){
     return INFILE.cnt;
 }
 
