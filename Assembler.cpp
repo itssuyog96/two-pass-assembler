@@ -7,6 +7,11 @@ using namespace std;
 
 #include "srcfile.h"
 
+#define OPCODE_INCR 4
+
+string operand[] = {"START", "USING", "L", "A", "ST", "END"};
+
+
 void initialize(int, char*);
 bool comment(string);
 bool emptyLine(string);
@@ -14,6 +19,31 @@ void runAssembler(void);
 
 void initialize(int argc, char *argv[]){
 	makeglobal(argc, argv);
+}
+typedef struct __opcode_table{
+	int rel_addr;
+	string opcode;
+	string reg;
+	string sec_rel_addr;
+	int start;
+	string using_register;
+	bool isStorage;
+}OT;
+
+OT ot[20];
+int default_register = 0;
+string def_using_reg;
+int ot_ctr = 0;
+int LC = 0;
+bool first_pass = true;
+
+
+bool isoperand(string str){
+	for(int i = 0; i < sizeof(operand) / sizeof(string); i++){
+		if(str.compare(operand[i]) == 0)
+			return true;
+	}
+	return false;
 }
 
 bool comment(string line){
@@ -140,6 +170,10 @@ store getStorage(string sym, string type, string str){
 	return __store;
 }
 
+string get_sec_rel_addr(string sym){
+	return sym;
+}
+
 assign getOperation(string str){
 	assign __op;
 
@@ -153,6 +187,18 @@ assign getOperation(string str){
 	}
 
 	return __op;
+}
+
+void addToOpcodeTable(string operand, string reg, bool first_pass, string sym, bool isStorage){
+    ot[ot_ctr].rel_addr = LC + OPCODE_INCR;
+    LC += OPCODE_INCR;
+    ot[ot_ctr].opcode = operand;
+    ot[ot_ctr].reg = reg;
+    ot[ot_ctr].sec_rel_addr = first_pass ? "-" : get_sec_rel_addr(sym);
+    ot[ot_ctr].start = default_register;
+    ot[ot_ctr].using_register = def_using_reg;
+	ot[ot_ctr].isStorage = isStorage;
+    ot_ctr++;
 }
 
 void runAssembler(){
@@ -170,13 +216,13 @@ void runAssembler(){
 		}
 
 		if(isEnd(sourceLine[scnt])){
-			cout << "Program ended" << endl;
+			//cout << "Program ended" << endl;
 			break;
 		}
 
 		//Comments handler
 		if(comment(sourceLine[scnt]) && scnt < fileSize()){
-			cout << "Comment : " << sourceLine[scnt] << endl;
+			//cout << "Comment : " << sourceLine[scnt] << endl;
 			scnt++;
 			flag = true;
 		}
@@ -188,28 +234,53 @@ void runAssembler(){
 
 		if(isExpression(sourceLine[scnt]) && scnt < fileSize()){
 			expr e = getExpression(sourceLine[scnt]);
-			cout << e.label << "|" << e.operand << "|" << e.operation << endl;
+			//cout << e.label << "|" << e.operand << "|" << e.operation << endl;
 
 			if(e.label.compare("-") == 0){
-				cout << "No label defined! " << endl;
+				//cout << "No label defined! " << endl;
 			}
+
+			if(e.operand.compare("START") == 0){
+				default_register = stoi(e.operation);
+				continue;
+			}
+
+
 			assign op;
 			store s;
+			
+
+			if(e.operand.compare("USING") == 0){
+				op =  getOperation(e.operation);
+				def_using_reg = op.sym;	
+				continue;
+			}
 
 			switch(getOperationType(e.operation)){
 				case 1 :
 					op = getOperation(e.operation);
-					cout << op.reg << "|" << op.sym << endl;
+					//cout << op.reg << "|" << op.sym << endl;
+
+					addToOpcodeTable(e.operand, op.reg, true, op.sym, false);
+					
 					break;
 				case 2 :
-					cout << "Second type" << endl;
+					//cout << "Second type" << endl;
 					s = getStorage(e.label, e.operand, e.operation);
-					cout << s.isConstant << "|" << s.isStorage << "|" << s.sym << "|" << s.type << "|" << s.value << endl;
+					//cout << s.isConstant << "|" << s.isStorage << "|" << s.sym << "|" << s.type << "|" << s.value << endl;
+					if(s.isConstant){
+						addToOpcodeTable(s.value, "NULL", true, "NULL", true);
+					}
+					else{
+						addToOpcodeTable("-", "NULL", true, "NULL", true);
+					}
+					
 					break;
 				case 3 :
-					cout << "Numeric : " << e.operation << endl;
+					//cout << "Numeric : " << e.operation << endl;
 					break;
-				default : cout << "Invalid operation!" << endl;
+				default :  //cout << "Invalid operation!" << endl;
+					break;
 			}
 
 			scnt++;
@@ -225,6 +296,22 @@ void runAssembler(){
 
 }
 
+void display_first_pass(){
+	cout << "\n\n\n--------- First Pass ---------\n\n" << endl;
+	cout << "---------------------------------" << endl;
+	cout << "Relative \t Mnemonic" << endl;
+	cout << "Address \t Instruction" << endl ;
+	cout << "---------------------------------" << endl;
+	for(int i = 0; i < ot_ctr; i++){
+		if(!ot[i].isStorage){
+			cout << ot[i].rel_addr << "\t\t\t" << ot[i].opcode << " " << ot[i].reg << "," << ot[i].sec_rel_addr << "(" << ot[i].start << ", " << ot[i].using_register << ")" << endl;
+		}
+		else{
+			cout << ot[i].rel_addr << "\t\t\t\t" << ot[i].opcode << endl;
+		}
+	}
+}
+
 int main(int argc, char *argv[])
 {    
 	initialize(argc, argv);
@@ -232,6 +319,7 @@ int main(int argc, char *argv[])
 	if(getSourceFile()){
     	
     	runAssembler();
+		display_first_pass();
     }
 
     return 0;
